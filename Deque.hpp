@@ -6,7 +6,7 @@
 /*   By: yechoi <yechoi@student.42seoul.kr>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/04/28 19:49:49 by yechoi            #+#    #+#             */
-/*   Updated: 2021/05/01 17:36:54 by yechoi           ###   ########.fr       */
+/*   Updated: 2021/05/01 20:27:07 by yechoi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -251,20 +251,32 @@ namespace ft
 		x.swap(y);
 	}
 
+	/* deque class (https://en.cppreference.com/w/cpp/container/deque) */
 	template <typename T, typename Alloc = std::allocator<T> >
 	class Deque
 	{
 		public:
 			typedef T value_type;
 			typedef Alloc allocator_type;
+			typedef size_t size_type;
+			typedef ptrdiff_t difference_type;
 			typedef value_type& reference;
 			typedef const value_type& const_reference;
 			typedef value_type* pointer;
 			typedef const value_type* const_pointer;
 			typedef DequeIterator<T> iterator;
 			typedef DequeIterator<T> const_iterator;
-			typedef ReverseIterator<iterator> rever
+			typedef ReverseIterator<iterator> reverse_iterator;
+			typedef ReverseIterator<const_iterator> const_reverse_iterator;
 
+		private:
+			typedef T** map_pointer;
+			typedef Deque<T> Self;
+
+			map_pointer m_map;
+			size_type m_size;
+			iterator m_start;
+			iterator m_finish;
 			
 
 	};
