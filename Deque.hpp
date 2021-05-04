@@ -6,7 +6,7 @@
 /*   By: yechoi <yechoi@student.42seoul.kr>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/04/28 19:49:49 by yechoi            #+#    #+#             */
-/*   Updated: 2021/05/01 20:27:07 by yechoi           ###   ########.fr       */
+/*   Updated: 2021/05/04 11:30:32 by yechoi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -277,8 +277,44 @@ namespace ft
 			size_type m_size;
 			iterator m_start;
 			iterator m_finish;
-			
 
+			enum { initial_map_size = 8 };
+			
+			static size_t buffer_size()
+			{
+				return DEQUE_BUF_SIZE_FOR(T);
+			}
+
+			/* https://gcc.gnu.org/onlinedocs/libstdc++/latest-doxygen/a00533_source.html :: 682 */
+			void initialize_map(size_t num_elements)
+			{
+				std::allocator<T *> map_allocator:
+				const size_t num_nodes = num_elements / buffer_size() + 1;
+
+				m_size = max((size_t)initial_map_size, size_t(num_nodes + 2));
+				m_map = map_allocator.allocate(buffer_size());
+
+				map_pointer nstart = m_map + (m_size - num_nodes) / 2; // 앞에 남는거 반절 또는 노드 하나 남겨두기
+				map_pointer nfinish = nstart + num_nodes; // nfinish 뒤에도 마찬가지로 남음
+				
+				std::allocator<T> allocator;
+				for (map_pointer cur = nstart; cur < nfinish; ++cur)
+				{
+					*cur = allocator.allocate(buffer_size());
+				}
+
+				m_start.set_node(nstart);
+				m_start.m_cur = nstart.m_first;
+				m_finish.set_node(nfinish - 1);
+				m_finish.m_cur = m_finish.m_first + num_elements % buffer_size();
+			}
+
+		public:
+			Deque()
+				: m_map(), m_map_size(0), m_start(), m_end()
+			{
+				initialize_map(0);
+			}
 	};
 }
 
