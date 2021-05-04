@@ -6,7 +6,7 @@
 /*   By: yechoi <yechoi@student.42seoul.kr>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/04/28 19:49:49 by yechoi            #+#    #+#             */
-/*   Updated: 2021/05/04 11:30:32 by yechoi           ###   ########.fr       */
+/*   Updated: 2021/05/04 17:22:06 by yechoi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -310,11 +310,98 @@ namespace ft
 			}
 
 		public:
+			/* constructor */
 			Deque()
-				: m_map(), m_map_size(0), m_start(), m_end()
+				: m_map(), m_size(0), m_start(), m_finish()
 			{
 				initialize_map(0);
 			}
+
+			// explicit
+			// Deque(const allocator_type& a)
+
+			explicit 
+			Deque(size_type count, const value_type& value = value_type())
+				: m_map(), m_size(0), m_start(), m_finish()
+			{
+				initialize_map(0);
+				
+			}
+
+			/* element access */
+			
+			/* iterators */
+			iterator
+			begin()
+			{
+				return (m_start);
+			}
+
+			const_iterator
+			begin() const
+			{
+				return (const_iterator(m_start));
+			}
+
+			iterator
+			end()
+			{
+				return (m_finish);
+			}
+
+			const_iterator
+			end() const
+			{
+				return (const_iterator(m_finish));
+			}
+
+			reverse_iterator
+			rbegin()
+			{
+				return (reverse_iterator(m_finish));
+			}
+
+			const_reverse_iterator
+			rbegin() const
+			{
+				return (const_reverse_iterator(m_finish));
+			}
+
+			reverse_iterator
+			rend()
+			{
+				return (reverse_iterator(m_start));
+			}
+
+			const_reverse_iterator
+			rend() const
+			{
+				return (const_reverse_iterator(m_start));
+			}
+
+			/* capacity */
+			void
+			empty() const
+			{
+				return (m_finish == m_start);
+			}
+
+			size_type
+			size() const
+			{
+				return (m_finish - m_start);
+			}
+
+			size_type
+			max_size() const
+			{
+				return (allocator_type().max_size());
+			}
+
+
+			/* modifiers */
+
+
 	};
 }
 
