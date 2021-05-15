@@ -6,7 +6,7 @@
 /*   By: yechoi <yechoi@student.42seoul.kr>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/04/28 19:49:49 by yechoi            #+#    #+#             */
-/*   Updated: 2021/05/04 17:22:06 by yechoi           ###   ########.fr       */
+/*   Updated: 2021/05/15 22:16:33 by yechoi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -178,6 +178,7 @@ namespace ft
 			}
 	};
 
+	/* non-member functions */
 	template <typename T>
 	bool operator==(const DequeIterator<T> &x, const DequeIterator<T> &y)
 	{
@@ -343,6 +344,78 @@ namespace ft
 					alloc.deallocate(*cur, buffer_size());
 			}
 
+			void reallocate_map(size_type nodes_to_add, bool add_at_front)
+			{
+				std::allocator<T *> map_alloc;
+
+				const size_type old_num_node = m_finish.m_node - m_start.m_node + 1;
+				const size_type new_num_nodes = old_num_node + nodes_to_add;
+
+				map_pointer new_nstart;
+				if (m_size > 2 * new_num_nodes)
+				{
+					new_nstart = m_map + (m_size - new_num_nodes) / 2 + (add_at_front ? nodes_to_add : 0);
+					if (new_nstart < m_start.m_node)
+						std::copy(m_start.m_node, m_finish.m_node + 1, new_nstart);
+					else
+						std::copy_backward(m_start.m_node, m_finish.m_node + 1, new_nstart + old_num_node);
+				}
+				else
+				{
+					size_type new_map_size = m_size + std::max(m_size, nodes_to_add) + 2;
+					map_pointer new_map = map_alloc.allocate(new_map_size);
+					new_nstart = new_map + (new_map_size - new_num_nodes) / 2 + (add_at_front ? nodes_to_add : 0);
+					std::copy(m_start.node, m_finish.node + 1, new_nstart);
+					map_alloc.deallocate(m_map, m_size);
+					m_map = new_map;
+					m_size = new_map_size;
+
+				}
+				m_start.set_node(new_nstart);
+				m_finish.set_node(new_nstart + old_num_node - 1);
+			}
+
+			void reserve_back(size_type n)
+			{
+				Alloc alloc;
+
+				// buffer left on last node
+				size_type rest = m_finish.m_last - m_finish.m_cur - 1;
+				// if more size is needed than left buffer size
+				if (n > rest)
+				{
+					// find out how many nodes to allocate`
+					size_type new_nodes = (n - 1) / buffer_size() + 1;
+
+					// if needed nodes are bigger than left nodes, reallocate new nodes
+					if (new_nodes + 1 > m_size - (m_finish.m_node - m_map))
+						reallocate_map(new_nodes, false);
+					// allocate each buffer on each node
+					for (size_type i = 1; i <= new_nodes; ++i)
+						*(m_finish.m_node + i) = alloc.allocate(buffer_size());
+				}
+				return (m_finish + difference_type(n));
+			}
+
+			void reserve_front(size_type n)
+			{
+				Alloc alloc;
+
+				size_type rest = m_start.m_cur - m_start.m_first;
+				if (n > rest)
+				{
+					size_type new_nodes = (n - 1) / buffer_size() + 1;
+
+					if (new_nodes > size_type(m_start.m_node - m_map))
+						reallocate_map(new_nodes, true);
+					for (size_type i = 1; i <= new_nodes; i++)
+					{
+						*(m_start.m_node - i) = alloc.allocate(buffer_size());
+					}
+					return (m_start - difference_type(n));
+				}
+			}
+
 		public:
 			/* constructor */
 			Deque()
@@ -362,9 +435,91 @@ namespace ft
 				
 			}
 
+			/* destructor */
+			~Deque()
+			{
+				clear();
+				destroy_node(m_start.node, m_finish.node + 1);
+				std::allocator<T *> map_alloc;
+				map_alloc.deallocate(m_map, m_size);
+			}
+
+			void
+			assign(size_type count, const T& value)
+			{
+				clear();
+
+			}
+
+			template< class InputIt>
+			void assign(Inputit first, InputIt last)
+			{
+
+			}
+
+			allocator_type
+			get_allocator() const
+			{
+
+			}
+
 			/* element access */
-			
-			
+			reference
+			at(size_type pos)
+			{
+				if (pos >= size())
+				{
+					throw (std::out_of_range;)
+				}
+				return (*this)[pos];
+			}
+
+			const_reference
+			at(size_type pos) const
+			{
+				if (pos >= size())
+				{
+					throw (std::out_of_range;)
+				}
+				return (*this)[pos];
+			}
+
+			reference
+			operator[](size_type pos)
+			{
+				return (m_start[difference_type[n]]);
+			}
+
+			const_reference
+			operator[](size_type pos) const
+			{
+				return (m_start[difference_type[n]]);
+			}
+
+			reference
+			front()
+			{
+				return (*m_start);
+			}
+
+			const_reference
+			front() const
+			{
+				return (*m_start);
+			}
+
+			reference
+			back()
+			{
+				return (*(m_finish - 1));
+			}
+
+			const_reference
+			back() const
+			{
+				return (*(m_finish - 1));
+			}
+
 			/* iterators */
 			iterator
 			begin()
@@ -442,6 +597,25 @@ namespace ft
 			}
 
 			iterator
+			insert(iterator pos, const T& value)
+			{
+
+			}
+
+			void
+			insert(iterator pos, size_type count, const T& value)
+			{
+
+			}
+			
+			template< class InputIt >
+			void 
+			insert(iterator pos, InputIt first, InputIt last)
+			{
+				
+			}
+
+			iterator
 			erase(iterator pos)
 			{
 				return (erase(pos, pos + 1));
@@ -465,7 +639,7 @@ namespace ft
 						}
 						// erase data before moved data
 						iterator pos = begin() + n;
-						destroy_data(begin(), post);
+						destroy_data(begin(), pos);
 						destroy_node(begin().m_node, pos.m_node);
 						m_start = pos;
 					}
@@ -481,7 +655,96 @@ namespace ft
 					return (begin() + elems_before);
 				}
 			}
-	};
-}
 
+			void
+			push_back(const T& value)
+			{
+				Alloc alloc;
+				iterator it = reserve_back(1) - 1;
+
+				alloc.constructor(it.m_cur, value);
+				m_finish = it + 1;
+			}
+
+			void
+			pop_back()
+			{
+				erase(m_finish - 1);
+			}
+
+			void
+			push_front(const T& value)
+			{
+				Alloc alloc;
+				iterator it = reserve_front(1);
+
+				alloc.construct(it.m_cur, val);
+				m_start = it;
+			}
+
+			void
+			pop_front
+			{
+				erase(m_start);
+			}
+
+			void
+			resize(size_type count, T value = T() )
+			{
+				if (count >= size())
+					insert(end(), count - size(), value);
+				else
+					erase(begin() + count, end());
+			} 
+
+			void
+			swap(Self &other)
+			{
+
+			}
+	};
+
+	/* non-member functions */
+	template< class T, class Alloc >
+	bool operator==(const Deque<T,Alloc>& lhs, const Deque<T,Alloc>& rhs)
+	{
+
+	}
+
+	template< class T, class Alloc >
+	bool operator!=(const Deque<T,Alloc>& lhs, const Deque<T,Alloc>& rhs)
+	{
+
+	}
+
+	template< class T, class Alloc >
+	bool operator<(const Deque<T,Alloc>& lhs, const Deque<T,Alloc>& rhs)
+	{
+
+	}
+
+	template< class T, class Alloc >
+	bool operator<=(const Deque<T,Alloc>& lhs, const Deque<T,Alloc>& rhs)
+	{
+
+	}
+
+	template< class T, class Alloc >
+	bool operator>(const Deque<T,Alloc>& lhs, const Deque<T,Alloc>& rhs)
+	{
+		
+	}
+
+	template< class T, class Alloc >
+	bool operator>=(const Deque<T,Alloc>& lhs, const Deque<T,Alloc>& rhs)
+	{
+
+	}
+
+	template< class T, class Alloc >
+	void swap(Deque<T,Alloc>& lhs, Deque<T,Alloc>& rhs)
+	{
+		
+	}
+};
 #endif
