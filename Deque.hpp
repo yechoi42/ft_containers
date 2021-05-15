@@ -309,6 +309,40 @@ namespace ft
 				m_finish.m_cur = m_finish.m_first + num_elements % buffer_size();
 			}
 
+			void destroy_data(iterator first, iterator last)
+			{
+				Alloc alloc;
+
+				for (map_pointer node = first.m_node + 1; node < last.m_node; ++node)
+				{
+					for (pointer p = *node; p < *node + buffer_size(); p++)
+					{
+						alloc.destroy(p);
+					}
+				}
+
+				if (first.m_node != last.m_node)
+				{
+					for (pointer p = first.m_cur; p < first.m_last; p++)
+						alloc.destroy(p);
+					for (pointer p = last.m_first; p < last.m_cur; p++)
+						alloc.destroy(p);
+				}
+				else
+				{
+					for (pointer p = first.m_cur; p < last.m_cur; p++)
+						allloc.destroy(p);
+				}
+			}
+
+			void destroy_node(map_pointer first, map_pointer last)
+			{
+				Alloc alloc;
+				
+				for (map_pointer cur = first; cur < last; ++cur)
+					alloc.deallocate(*cur, buffer_size());
+			}
+
 		public:
 			/* constructor */
 			Deque()
@@ -329,6 +363,7 @@ namespace ft
 			}
 
 			/* element access */
+			
 			
 			/* iterators */
 			iterator
@@ -400,8 +435,52 @@ namespace ft
 
 
 			/* modifiers */
+			void
+			clear()
+			{
+				erase(begin(), end());
+			}
 
+			iterator
+			erase(iterator pos)
+			{
+				return (erase(pos, pos + 1));
+			}
 
+			iterator
+			erase(iterator first, iterator last)
+			{
+				if (first == last)
+					return (first);
+				else
+				{
+					const difference_type n = last - first;
+					const difference_type elems_before = first - begin();
+					if (static_cast<size_type>(elems_before) <= (size() - n) / 2)
+					{
+						// move data before first
+						if (first != begin())
+						{
+							move_backward(begin(), first, last);
+						}
+						// erase data before moved data
+						iterator pos = begin() + n;
+						destroy_data(begin(), post);
+						destroy_node(begin().m_node, pos.m_node);
+						m_start = pos;
+					}
+					else
+					{
+						if (last != end())
+							move(last, end(), first);
+						iterator pos = end() - n;
+						destroy_data(pos, end);
+						destroy_node(pos.m_node + 1, end.m_node + 1);
+						m_finish = pos;
+					}
+					return (begin() + elems_before);
+				}
+			}
 	};
 }
 
