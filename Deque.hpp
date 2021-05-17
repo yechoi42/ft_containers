@@ -6,7 +6,7 @@
 /*   By: yechoi <yechoi@student.42seoul.kr>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/04/28 19:49:49 by yechoi            #+#    #+#             */
-/*   Updated: 2021/05/15 22:16:33 by yechoi           ###   ########.fr       */
+/*   Updated: 2021/05/17 15:48:13 by yechoi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,8 +31,8 @@ namespace ft
 			typedef T& reference;
 			typedef size_t size_type;
 			typedef ptrdiff_t difference_type;
+			
 			typedef DequeIterator Self;
-
 			typedef T** map_pointer;
 
 			pointer m_cur;
@@ -451,7 +451,7 @@ namespace ft
 
 			}
 
-			template< class InputIt>
+			template<typedef InputIt>
 			void assign(Inputit first, InputIt last)
 			{
 
@@ -608,7 +608,7 @@ namespace ft
 
 			}
 			
-			template< class InputIt >
+			template< typedef InputIt >
 			void 
 			insert(iterator pos, InputIt first, InputIt last)
 			{
