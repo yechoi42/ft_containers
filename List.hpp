@@ -6,7 +6,7 @@
 /*   By: yechoi <yechoi@student.42seoul.kr>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/05/17 13:20:05 by yechoi            #+#    #+#             */
-/*   Updated: 2021/05/17 20:45:09 by yechoi           ###   ########.fr       */
+/*   Updated: 2021/05/20 12:39:51 by yechoi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -474,18 +474,38 @@ namespace ft
             void 
             splice(const_iterator pos, Self& other)
             {
-
+                splice(pos, other, other.begin(), other.end());
             }
 
             void 
             splice(const_iterator pos, Self& other, const_iterator it)
             {
+                iterator next = it;
+                ++next;
+                splice(pos, other, it, next);
             }
 
             void 
             splice(const_iterator pos, Self& other, const_iterator first, const_iterator last)
             {
+                Node *right_node = pos.m_node;
+                Node *left_node = right_node->m_prev;
 
+                Node *other_right_node = last.m_node;
+                Node *other_left_node = first.m_node->m_prev;
+
+                size_type count = 0;
+                while (first != last)
+                {
+                    ++first;
+                    ++count;
+                }
+                first.m_node->m_prev = left_node;
+                last.m_node->m_prev->m_next = right_node;
+                other_left_node->m_next = m_last;
+                other_right_node->m_prev = other_left_node;
+                m_len += count;
+                other.m_len -= count;
             }
 
             void
@@ -522,14 +542,42 @@ namespace ft
             void
             unique()
             {
-
+                if (begin() == end())
+                    return ;
+                iterator cur = this->begin();
+                iterator next = prev;
+                ++next;
+                while (next != end())
+                {
+                    if (*cur == *next)
+                        erase(next);
+                    else
+                    {
+                        cur = next;
+                        ++next;
+                    }
+                }
             }
 
             template <typedef BinaryPredicate>
             void
             unique(BinaryPredicate p)
             {
-
+                if (begin() == end())
+                    return ;
+                iterator cur = this->begin();
+                iterator next = prev;
+                ++next;
+                while (next != end())
+                {
+                    if (p(*cur, *next))
+                        erase(next);
+                    else
+                    {
+                        cur = next;
+                        ++next;                        
+                    }
+                }
             }
 
             void
