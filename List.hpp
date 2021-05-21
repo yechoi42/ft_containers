@@ -211,12 +211,6 @@ namespace ft
                 insert(begin(), first, last);
             }
 
-			allocator_type
-			get_allocator() const
-			{
-
-			}
-
             /* element access */
             reference
             front()
@@ -536,7 +530,25 @@ namespace ft
             void
             reverse()
             {
-
+                iterator it = begin();
+                iterator begin = it;
+                while (it != end())
+                {
+                    if (it.m_node->m_next == end())
+                    {
+                        iterator tmp = it;
+                        tmp.m_node->m_next = tmp.m_node->m_prev;
+                        tmp.m_node->m_prev = NULL;
+                        m_head = tmp.m_node;
+                    }
+                    else
+                    {
+                        std::swap(it.m_node->m_prev, it.m_node->m_next);
+                    }
+                    ++it; 
+                }
+                m_tail->prev = begin.m_node;
+                begin.m_node->next = m_tail; 
             }
 
             void
